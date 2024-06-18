@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Booking_System.iml" filepath="$PROJECT_DIR$/Booking_System.iml" />
+      <module fileurl="file://$PROJECT_DIR$/backend/booking_service/booking_service.iml" filepath="$PROJECT_DIR$/backend/booking_service/booking_service.iml" />
+    </modules>
+  </component>
+</project>
