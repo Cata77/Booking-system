@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$/backend/booking_service" />
+    <file type="web" url="file://$PROJECT_DIR$/backend/gateway_service" />
     <file type="web" url="file://$PROJECT_DIR$/backend/hotel_service" />
     <file type="web" url="file://$PROJECT_DIR$/backend/search_service" />
     <file type="web" url="file://$PROJECT_DIR$/backend/user_service" />
