@@ -1,0 +1,11 @@
+server:
+  port: 8222
+eureka:
+  client:
+    fetch-registry: false
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
