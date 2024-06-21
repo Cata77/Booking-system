@@ -4,6 +4,8 @@ eureka:
   client:
     fetch-registry: false
 spring:
+  application:
+    name: gateway_service
   cloud:
     gateway:
       discovery:
