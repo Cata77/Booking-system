@@ -3,12 +3,13 @@
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/backend/booking_service" />
+    <file type="web" url="file://$PROJECT_DIR$/backend/discovery_service" />
     <file type="web" url="file://$PROJECT_DIR$/backend/gateway_service" />
     <file type="web" url="file://$PROJECT_DIR$/backend/hotel_service" />
     <file type="web" url="file://$PROJECT_DIR$/backend/search_service" />
     <file type="web" url="file://$PROJECT_DIR$/backend/user_service" />
   </component>
-  <component name="ProjectRootManager">
+  <component name="ProjectRootManager" version="2" project-jdk-name="21" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>
