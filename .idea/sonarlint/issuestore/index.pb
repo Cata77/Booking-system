@@ -973,3 +973,15 @@ Q.idea/sonarlint/securityhotspotstore/9/8/9808c284ef75b71e3b8756d11d8386502268f5
 Q.idea/sonarlint/securityhotspotstore/9/8/98d667af37cf328bc2e9112b1a222e6be492ac37,f\1\f1539171abee367db1a0c42c23b0ad3b4171810c
 B
 docker-compose.yml,3\5\35b8c13cf2eb2a194eada000eb310d65aed53b2a
+‡
+Wbackend/user_service/src/main/java/org/booking/user_service/UserServiceApplication.java,5\e\5e28ecdeaa56e1f982fbc70e6f36d6e8f17a2ccb
+{
+Kbackend/user_service/src/main/java/org/booking/user_service/model/User.java,d\b\db9edadddd9c879f25c4ecf3e6b965f83e6faa13
+Q
+!backend/user_service/build.gradle,8\a\8ae4a85f4d833452a7c05728f232a174fb4ca909
+ƒ
+Sbackend/user_service/src/main/java/org/booking/user_service/model/UserCategory.java,e\4\e457ee93d1028fa51c45a18c5f03424d0a2b4848
+
+Obackend/user_service/src/main/java/org/booking/user_service/UserRepository.java,5\3\53652606e5a6952b5c354d4dd4705b33c7ba272d
+Š
+Zbackend/user_service/src/main/java/org/booking/user_service/repository/UserRepository.java,3\a\3adaa77f02a6f534c703c331131e74e98ba09306
