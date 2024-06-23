@@ -15,7 +15,6 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/backend/config_service" />
-        <option name="gradleHome" value="$PROJECT_DIR$/../../../gradle-8.0.1" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
@@ -70,16 +69,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/backend/user_service" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/config_service" />
-        <option name="gradleHome" value="$PROJECT_DIR$/../../../gradle-8.0.1" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/config_service" />
           </set>
         </option>
       </GradleProjectSettings>

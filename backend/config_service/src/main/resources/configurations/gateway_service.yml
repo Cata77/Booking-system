@@ -1,8 +1,12 @@
 server:
   port: 8222
+
 eureka:
+  instance:
+    hostname: localhost
   client:
-    fetch-registry: false
+    fetch-registry: true
+
 spring:
   application:
     name: gateway_service
@@ -11,3 +15,10 @@ spring:
       discovery:
         locator:
           enabled: true
+      routes:
+        - id: users
+          uri: http://localhost:8010
+          predicates:
+            - Path=/users/**
+          filters:
+            - PrefixPath=/api/v1

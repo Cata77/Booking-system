@@ -2,15 +2,18 @@ package org.booking.user_service.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @Entity
+@Table(name = "app_user")
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class User implements Serializable {
 
     @Id
