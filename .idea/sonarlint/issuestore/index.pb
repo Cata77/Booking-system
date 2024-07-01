@@ -907,3 +907,7 @@ m
 =backend/user_service/gradle/wrapper/gradle-wrapper.properties,2\6\26f8c1ec36519f85c85f82ba4e763c5354afb65a
 Š
 Zbackend/config_service/src/main/java/org/cata/config_service/ConfigServiceApplication.java,f\c\fc9af6ca4af94d5f057f5d616bd33733dbc7210b
+‰
+Ybackend/gateway_service/src/main/java/org/cata/gateway_service/config/SecurityConfig.java,1\3\1391b863ba5ecd357a30a056d6d9bd5e6bf257dd
+†
+Vbackend/user_service/src/main/java/org/booking/user_service/config/SecurityConfig.java,f\5\f5884bdee6fca94bfdaeed086badc53da4ffbd6f

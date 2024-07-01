@@ -15,6 +15,8 @@ spring:
       discovery:
         locator:
           enabled: true
+      default-filters:
+        - TokenRelay=
       routes:
         - id: users
           uri: http://localhost:8010
@@ -22,3 +24,19 @@ spring:
             - Path=/users/**
           filters:
             - PrefixPath=/api/v1
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/realms/Booking-System/protocol/openid-connect/certs
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/Booking-System
+        registration:
+          backend:
+            provider: keycloak
+            client-id: backend
+            client-secret: 6khInHEwAiSmemZvgZWPRCfLUQBuuidf
+            authorization-grant-type: authorization_code
+            scope: openid
