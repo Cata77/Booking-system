@@ -1,34 +1,37 @@
 package org.booking.user_service.service;
 
-import com.password4j.BcryptFunction;
-import com.password4j.Hash;
-import com.password4j.Password;
-import com.password4j.types.Bcrypt;
 import lombok.RequiredArgsConstructor;
-import org.booking.user_service.exception.UserAlreadyTakenException;
 import org.booking.user_service.model.User;
-import org.booking.user_service.repository.UserRepository;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository repository;
+    public User extractUserDetailsFromJwt(Jwt jwt) {
+        String subject = (String) jwt.getClaims().get("sub");
+        UUID uuid = UUID.fromString(subject);
+        String username = (String) jwt.getClaims().get("preferred_username");
+        String firstname = (String) jwt.getClaims().get("given_name");
+        String lastname = (String) jwt.getClaims().get("family_name");
+        String email = (String) jwt.getClaims().get("email");
+        String country = (String) jwt.getClaims().get("country");
+        String city = (String) jwt.getClaims().get("city");
+        String address = (String) jwt.getClaims().get("address");
 
-    public void createUser(User user) {
-        boolean emailAlreadyExists = repository.existsByEmail(user.getEmail());
-        if (emailAlreadyExists)
-            throw new UserAlreadyTakenException();
-
-        BcryptFunction bcrypt = BcryptFunction.getInstance(Bcrypt.B, 12);
-        Hash hash = Password.hash(user.getPassword())
-                .addPepper("shared-secret")
-                .with(bcrypt);
-        user.setPassword(hash.getResult());
-        repository.save(user);
+        return User.builder()
+                .uuid(uuid)
+                .username(username)
+                .firstname(firstname)
+                .lastname(lastname)
+                .email(email)
+                .country(country)
+                .city(city)
+                .address(address)
+                .build();
     }
 
 }

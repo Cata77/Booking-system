@@ -24,7 +24,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public DefaultMethodSecurityExpressionHandler msecurity() {
+    public DefaultMethodSecurityExpressionHandler methodSecurityExpressionHandler() {
         DefaultMethodSecurityExpressionHandler defaultMethodSecurityExpressionHandler =
                 new DefaultMethodSecurityExpressionHandler();
         defaultMethodSecurityExpressionHandler.setDefaultRolePrefix("");
