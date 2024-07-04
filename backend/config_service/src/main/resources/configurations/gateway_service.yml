@@ -24,6 +24,12 @@ spring:
             - Path=/users/**
           filters:
             - PrefixPath=/api/v1
+        - id: hotels
+          uri: http://localhost:8020
+          predicates:
+            - Path=/hotels/**
+          filters:
+            - PrefixPath=/api/v1
   security:
     oauth2:
       resourceserver:
