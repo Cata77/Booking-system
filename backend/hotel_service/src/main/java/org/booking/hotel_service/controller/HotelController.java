@@ -6,13 +6,7 @@ import org.booking.hotel_service.service.HotelService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/hotels")
@@ -33,5 +27,14 @@ public class HotelController {
     public ResponseEntity<HotelDTO> addNewHotel(@RequestBody Hotel hotel) {
         HotelDTO createdHotel = service.createHotel(hotel);
         return new ResponseEntity<>(createdHotel, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{hotel_id}/rooms")
+    @PreAuthorize("hasRole('owner')")
+    public ResponseEntity<RoomDTO> addRoomsToHotel(
+            @RequestBody Room room,
+            @PathVariable("hotel_id") Long hotelId) {
+        RoomDTO createdRoom = service.createHotelRoom(room, hotelId);
+        return new ResponseEntity<>(createdRoom, HttpStatus.CREATED);
     }
 }

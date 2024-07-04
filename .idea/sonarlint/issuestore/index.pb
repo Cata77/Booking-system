@@ -945,3 +945,5 @@ ibackend/hotel_service/src/main/java/org/booking/hotel_service/exception/HotelAl
 fbackend/hotel_service/src/main/java/org/booking/hotel_service/exception/ExceptionControllerAdvice.java,9\3\932e2caa19add2b09c572641aa5302cf69fea813
 €
 Pbackend/hotel_service/src/main/java/org/booking/hotel_service/model/RoomDTO.java,a\8\a81b6417f5fb4d0486d12483aff84d799db6208b
+“
+cbackend/hotel_service/src/main/java/org/booking/hotel_service/exception/HotelNotFoundException.java,0\d\0d653595c7a7775a8ef44f9c8a80019b4055bd97

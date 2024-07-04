@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalTime;
 
 public record HotelDTO (
+        Long id,
         String name,
         String country,
         String city,
