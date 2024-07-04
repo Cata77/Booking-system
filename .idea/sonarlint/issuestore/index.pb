@@ -943,3 +943,5 @@ Qbackend/hotel_service/src/main/java/org/booking/hotel_service/model/HotelDTO.ja
 ibackend/hotel_service/src/main/java/org/booking/hotel_service/exception/HotelAlreadyCreatedException.java,c\c\cc95a0ee951f707e8ec3a2755a97d8c5d3a09f22
 –
 fbackend/hotel_service/src/main/java/org/booking/hotel_service/exception/ExceptionControllerAdvice.java,9\3\932e2caa19add2b09c572641aa5302cf69fea813
+€
+Pbackend/hotel_service/src/main/java/org/booking/hotel_service/model/RoomDTO.java,a\8\a81b6417f5fb4d0486d12483aff84d799db6208b

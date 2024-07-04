@@ -1,9 +1,7 @@
 package org.booking.hotel_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.booking.hotel_service.model.Feature;
-import org.booking.hotel_service.model.Hotel;
-import org.booking.hotel_service.model.HotelDTO;
+import org.booking.hotel_service.model.*;
 import org.booking.hotel_service.service.HotelService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +31,7 @@ public class HotelController {
     @PostMapping
     @PreAuthorize("hasRole('owner')")
     public ResponseEntity<HotelDTO> addNewHotel(@RequestBody Hotel hotel) {
-        JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) authenticationToken.getCredentials();
-        HotelDTO createdHotel = service.createHotel(jwt, hotel);
+        HotelDTO createdHotel = service.createHotel(hotel);
         return new ResponseEntity<>(createdHotel, HttpStatus.CREATED);
     }
 }
