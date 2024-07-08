@@ -6,6 +6,7 @@ import org.booking.hotel_service.exception.HotelAlreadyCreatedException;
 import org.booking.hotel_service.exception.HotelNotFoundException;
 import org.booking.hotel_service.model.*;
 import org.booking.hotel_service.repository.FeatureRepository;
+import org.booking.hotel_service.repository.HotelFeatureRepository;
 import org.booking.hotel_service.repository.HotelRepository;
 import org.booking.hotel_service.repository.RoomRepository;
 import org.springframework.cache.annotation.CachePut;
@@ -14,9 +15,11 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ public class HotelService {
     private final HotelRepository hotelRepository;
     private final RoomRepository roomRepository;
     private final FeatureRepository featureRepository;
+    private final HotelFeatureRepository hotelFeatureRepository;
 
     private Jwt extractJWT() {
         JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -88,5 +92,35 @@ public class HotelService {
                 room.getMaxGuestsCount(),
                 room.getPrice()
         );
+    }
+
+    @Transactional
+    @CachePut(value = "hotel_feature", key = "#result.id")
+    public HotelFeatureDTO addHotelFeatures(Long hotelId, Set<Feature> features) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(HotelNotFoundException::new);
+
+        Set<HotelFeature> hotelFeatures = features.stream()
+                .map(feature -> createHotelFeature(hotel, feature))
+                .collect(Collectors.toSet());
+
+        hotelFeatureRepository.saveAll(hotelFeatures);
+
+        Set<String> featureNames = features.stream()
+                .map(Feature::getName)
+                .collect(Collectors.toSet());
+
+        return new HotelFeatureDTO(
+                hotelId,
+                hotel.getName(),
+                featureNames
+        );
+    }
+
+    private HotelFeature createHotelFeature(Hotel hotel, Feature feature) {
+        HotelFeature hotelFeature = new HotelFeature();
+        hotelFeature.setHotel(hotel);
+        hotelFeature.setFeature(feature);
+        return hotelFeature;
     }
 }

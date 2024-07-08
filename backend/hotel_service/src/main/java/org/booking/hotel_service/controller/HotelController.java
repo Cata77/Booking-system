@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 @RestController
 @RequestMapping("/api/v1/hotels")
 @RequiredArgsConstructor
@@ -31,10 +33,21 @@ public class HotelController {
 
     @PostMapping("/{hotel_id}/rooms")
     @PreAuthorize("hasRole('owner')")
-    public ResponseEntity<RoomDTO> addRoomsToHotel(
-            @RequestBody Room room,
-            @PathVariable("hotel_id") Long hotelId) {
+    public ResponseEntity<RoomDTO> addHotelRooms(
+            @PathVariable("hotel_id") Long hotelId,
+            @RequestBody Room room
+    ) {
         RoomDTO createdRoom = service.createHotelRoom(room, hotelId);
         return new ResponseEntity<>(createdRoom, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{hotel_id}/features")
+    @PreAuthorize("hasRole('owner')")
+    public ResponseEntity<HotelFeatureDTO> addHotelFeatures(
+            @PathVariable("hotel_id") Long hotelId,
+            @RequestBody Set<Feature> features
+    ) {
+        HotelFeatureDTO hotelFeature = service.addHotelFeatures(hotelId, features);
+        return new ResponseEntity<>(hotelFeature, HttpStatus.CREATED);
     }
 }
