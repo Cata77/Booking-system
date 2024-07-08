@@ -15,8 +15,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -73,20 +71,17 @@ public class HotelService {
     @Transactional
     @CachePut(value = "rooms", key = "#room.id")
     public RoomDTO createHotelRoom(Room room, Long hotelId) {
-        Optional<Hotel> hotel = hotelRepository.findById(hotelId);
-        if (hotel.isEmpty())
-            throw new HotelNotFoundException();
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(HotelNotFoundException::new);
 
-        room.setHotel(hotel.get());
-        Set<Room> hotelRooms = hotel.get().getRooms();
-        hotelRooms.add(room);
-        hotel.get().setRooms(hotelRooms);
+        room.setHotel(hotel);
+        hotel.getRooms().add(room);
         roomRepository.save(room);
-        hotelRepository.save(hotel.get());
+        hotelRepository.save(hotel);
 
         return new RoomDTO(
                 room.getId(),
-                hotel.get().getName(),
+                hotel.getName(),
                 room.getBedroomCount(),
                 room.getBedCount(),
                 room.getMaxGuestsCount(),
