@@ -57,4 +57,11 @@ public class HotelController {
         HotelDTO hotelDTO = service.viewHotelDetails(hotelId);
         return new ResponseEntity<>(hotelDTO, HttpStatus.OK);
     }
+
+    @DeleteMapping("/{hotel_id}")
+    @PreAuthorize("hasRole('owner')")
+    public ResponseEntity<?> removeHotel(@PathVariable("hotel_id") Long hotelId) {
+        service.removeHotel(hotelId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

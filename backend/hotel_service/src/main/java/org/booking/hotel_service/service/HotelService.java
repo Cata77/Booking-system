@@ -152,4 +152,18 @@ public class HotelService {
                 .features(features)
                 .build();
     }
+
+    @Transactional
+    public void removeHotel(Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(HotelNotFoundException::new);
+
+        Set<Room> rooms = roomRepository.findByHotelId(hotelId);
+        roomRepository.deleteAll(rooms);
+
+        Set<HotelFeature> hotelFeatures = hotelFeatureRepository.findHotelFeatureByHotelId(hotelId);
+        hotelFeatureRepository.deleteAll(hotelFeatures);
+
+        hotelRepository.delete(hotel);
+    }
 }
