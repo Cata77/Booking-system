@@ -53,19 +53,19 @@ public class HotelService {
         hotel.setUserId(userId);
         hotelRepository.save(hotel);
 
-        return new HotelDTO(
-                hotel.getId(),
-                hotel.getName(),
-                hotel.getCountry(),
-                hotel.getCity(),
-                hotel.getAddress(),
-                hotel.getHotelCategory(),
-                hotel.getAccommodationType(),
-                hotel.getPropertyType(),
-                hotel.getDescription(),
-                hotel.getCheckInTime(),
-                hotel.getCheckOutTime()
-        );
+        return HotelDTO.builder()
+                .id(hotel.getId())
+                .name(hotel.getName())
+                .country(hotel.getCountry())
+                .city(hotel.getCity())
+                .address(hotel.getAddress())
+                .hotelCategory(hotel.getHotelCategory())
+                .accommodationType(hotel.getAccommodationType())
+                .propertyType(hotel.getPropertyType())
+                .description(hotel.getDescription())
+                .checkInTime(hotel.getCheckInTime())
+                .checkOutTime(hotel.getCheckOutTime())
+                .build();
     }
 
     @Transactional
@@ -75,9 +75,7 @@ public class HotelService {
                 .orElseThrow(HotelNotFoundException::new);
 
         room.setHotel(hotel);
-        hotel.getRooms().add(room);
         roomRepository.save(room);
-        hotelRepository.save(hotel);
 
         return new RoomDTO(
                 room.getId(),
@@ -117,5 +115,41 @@ public class HotelService {
         hotelFeature.setHotel(hotel);
         hotelFeature.setFeature(feature);
         return hotelFeature;
+    }
+
+    @Transactional
+//    @Cacheable(value = "hotels", key = "#hotelId")
+    public HotelDTO viewHotelDetails(Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(HotelNotFoundException::new);
+
+        Set<Room> rooms = roomRepository.findByHotelId(hotelId);
+        Set<RoomDTO> roomDTOS = rooms.stream()
+                .map(room -> new RoomDTO(
+                        room.getId(),
+                        hotel.getName(),
+                        room.getBedroomCount(),
+                        room.getBedCount(),
+                        room.getMaxGuestsCount(),
+                        room.getPrice()))
+                .collect(Collectors.toSet());
+
+        Set<String> features = hotelRepository.findHotelFeatureList();
+
+        return HotelDTO.builder()
+                .id(hotel.getId())
+                .name(hotel.getName())
+                .country(hotel.getCountry())
+                .city(hotel.getCity())
+                .address(hotel.getAddress())
+                .hotelCategory(hotel.getHotelCategory())
+                .accommodationType(hotel.getAccommodationType())
+                .propertyType(hotel.getPropertyType())
+                .description(hotel.getDescription())
+                .checkInTime(hotel.getCheckInTime())
+                .checkOutTime(hotel.getCheckOutTime())
+                .rooms(roomDTOS)
+                .features(features)
+                .build();
     }
 }

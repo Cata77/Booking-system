@@ -50,4 +50,11 @@ public class HotelController {
         HotelFeatureDTO hotelFeature = service.addHotelFeatures(hotelId, features);
         return new ResponseEntity<>(hotelFeature, HttpStatus.CREATED);
     }
+
+    @GetMapping("/{hotel_id}")
+    @PreAuthorize("hasRole('user')")
+    public ResponseEntity<HotelDTO> viewHotel(@PathVariable("hotel_id") Long hotelId) {
+        HotelDTO hotelDTO = service.viewHotelDetails(hotelId);
+        return new ResponseEntity<>(hotelDTO, HttpStatus.OK);
+    }
 }

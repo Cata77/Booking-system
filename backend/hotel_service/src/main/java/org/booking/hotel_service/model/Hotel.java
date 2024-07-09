@@ -40,8 +40,5 @@ public class Hotel implements Serializable {
     private LocalTime checkOutTime;
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Room> rooms;
-
-    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<HotelFeature> hotelFeatures;
 }
