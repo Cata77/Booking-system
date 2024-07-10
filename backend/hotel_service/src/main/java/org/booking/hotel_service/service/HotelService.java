@@ -168,6 +168,17 @@ public class HotelService {
     }
 
     @Transactional
+    public RoomDTO viewRoom(Long hotelId, Long roomId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(HotelNotFoundException::new);
+
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(RoomNotFoundException::new);
+
+        return createRoomDTO(room, hotel);
+    }
+
+    @Transactional
     public void removeHotel(Long hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(HotelNotFoundException::new);
@@ -187,4 +198,6 @@ public class HotelService {
                         .orElseThrow(RoomNotFoundException::new);
         roomRepository.delete(room);
     }
+
+
 }
