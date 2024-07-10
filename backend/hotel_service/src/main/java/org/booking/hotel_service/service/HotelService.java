@@ -126,13 +126,7 @@ public class HotelService {
 
         Set<Room> rooms = roomRepository.findByHotelId(hotelId);
         Set<RoomDTO> roomDTOS = rooms.stream()
-                .map(room -> new RoomDTO(
-                        room.getId(),
-                        hotel.getName(),
-                        room.getBedroomCount(),
-                        room.getBedCount(),
-                        room.getMaxGuestsCount(),
-                        room.getPrice()))
+                .map(room -> createRoomDTO(room, hotel))
                 .collect(Collectors.toSet());
 
         Set<String> features = hotelRepository.findHotelFeatureList();
@@ -152,6 +146,25 @@ public class HotelService {
                 .rooms(roomDTOS)
                 .features(features)
                 .build();
+    }
+
+    public Set<RoomDTO> viewHotelRooms(Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(HotelNotFoundException::new);
+
+        return roomRepository.findByHotelId(hotelId).stream()
+                .map(room -> createRoomDTO(room, hotel))
+                .collect(Collectors.toSet());
+    }
+
+    private RoomDTO createRoomDTO(Room room, Hotel hotel) {
+        return new RoomDTO(
+                room.getId(),
+                hotel.getName(),
+                room.getBedroomCount(),
+                room.getBedCount(),
+                room.getMaxGuestsCount(),
+                room.getPrice());
     }
 
     @Transactional
