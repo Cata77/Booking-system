@@ -64,4 +64,14 @@ public class HotelController {
         service.removeHotel(hotelId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @DeleteMapping("/{hotel_id}/rooms/{room_id}")
+    @PreAuthorize("hasRole('owner')")
+    public ResponseEntity<?> removeRoom(
+            @PathVariable("hotel_id") Long hotelId,
+            @PathVariable("room_id") Long roomId
+    ) {
+        service.removeRoom(roomId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

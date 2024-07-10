@@ -23,4 +23,12 @@ public class ExceptionControllerAdvice {
                 .status(HttpStatus.NOT_FOUND)
                 .body(errorDetails);
     }
+
+    @ExceptionHandler(RoomNotFoundException.class)
+    public ResponseEntity<ErrorDetails> exceptionRoomNotFoundHandler() {
+        ErrorDetails errorDetails = new ErrorDetails("Room not found!");
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(errorDetails);
+    }
 }

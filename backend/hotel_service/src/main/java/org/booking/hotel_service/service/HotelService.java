@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.booking.hotel_service.exception.HotelAlreadyCreatedException;
 import org.booking.hotel_service.exception.HotelNotFoundException;
+import org.booking.hotel_service.exception.RoomNotFoundException;
 import org.booking.hotel_service.model.*;
 import org.booking.hotel_service.repository.FeatureRepository;
 import org.booking.hotel_service.repository.HotelFeatureRepository;
@@ -165,5 +166,12 @@ public class HotelService {
         hotelFeatureRepository.deleteAll(hotelFeatures);
 
         hotelRepository.delete(hotel);
+    }
+
+    @Transactional
+    public void removeRoom(Long roomId) {
+        Room room = roomRepository.findById(roomId)
+                        .orElseThrow(RoomNotFoundException::new);
+        roomRepository.delete(room);
     }
 }
