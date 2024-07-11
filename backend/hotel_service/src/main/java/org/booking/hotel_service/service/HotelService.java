@@ -196,9 +196,6 @@ public class HotelService {
 
     @Transactional
     public Set<FeatureDTO> getHotelFeatures(Long hotelId) {
-        Hotel hotel = hotelRepository.findById(hotelId)
-                .orElseThrow(HotelNotFoundException::new);
-
         Set<String> featureNames = hotelRepository.findHotelFeatureList(hotelId);
         Set<Feature> features = featureNames.stream()
                 .map(featureRepository::findByName)
