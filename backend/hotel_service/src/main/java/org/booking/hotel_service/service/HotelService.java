@@ -2,6 +2,7 @@ package org.booking.hotel_service.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.booking.hotel_service.exception.FeatureNotFoundException;
 import org.booking.hotel_service.exception.HotelAlreadyCreatedException;
 import org.booking.hotel_service.exception.HotelNotFoundException;
 import org.booking.hotel_service.exception.RoomNotFoundException;
@@ -16,6 +17,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -99,15 +101,17 @@ public class HotelService {
                 .collect(Collectors.toSet());
 
         hotelFeatureRepository.saveAll(hotelFeatures);
-
-        Set<String> featureNames = features.stream()
-                .map(Feature::getName)
+        Set<FeatureDTO> featureDTOS = features.stream()
+                .map(feature -> new FeatureDTO(
+                        feature.getId(),
+                        feature.getName()
+                ))
                 .collect(Collectors.toSet());
 
         return new HotelFeatureDTO(
                 hotelId,
                 hotel.getName(),
-                featureNames
+                featureDTOS
         );
     }
 
@@ -129,7 +133,19 @@ public class HotelService {
                 .map(room -> createRoomDTO(room, hotel))
                 .collect(Collectors.toSet());
 
-        Set<String> features = hotelRepository.findHotelFeatureList();
+        Set<String> featureNames = hotelRepository.findHotelFeatureList(hotelId);
+        Set<Feature> features = featureNames.stream()
+                .map(featureRepository::findByName)
+                .flatMap(Optional::stream)
+                .collect(Collectors.toSet());
+
+        Set<FeatureDTO> featureDTOS = features.stream()
+                .map(feature -> new FeatureDTO(
+                        feature.getId(),
+                        feature.getName()
+                ))
+                .collect(Collectors.toSet());
+
 
         return HotelDTO.builder()
                 .id(hotel.getId())
@@ -144,7 +160,7 @@ public class HotelService {
                 .checkInTime(hotel.getCheckInTime())
                 .checkOutTime(hotel.getCheckOutTime())
                 .rooms(roomDTOS)
-                .features(features)
+                .features(featureDTOS)
                 .build();
     }
 
@@ -179,6 +195,25 @@ public class HotelService {
     }
 
     @Transactional
+    public Set<FeatureDTO> getHotelFeatures(Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(HotelNotFoundException::new);
+
+        Set<String> featureNames = hotelRepository.findHotelFeatureList(hotelId);
+        Set<Feature> features = featureNames.stream()
+                .map(featureRepository::findByName)
+                .flatMap(Optional::stream)
+                .collect(Collectors.toSet());
+
+        return features.stream()
+                .map(feature -> new FeatureDTO(
+                        feature.getId(),
+                        feature.getName()
+                ))
+                .collect(Collectors.toSet());
+    }
+
+    @Transactional
     public void removeHotel(Long hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(HotelNotFoundException::new);
@@ -193,22 +228,16 @@ public class HotelService {
     }
 
     @Transactional
-    public HotelFeatureDTO getHotelFeatures(Long hotelId) {
-        Hotel hotel = hotelRepository.findById(hotelId)
-                .orElseThrow(HotelNotFoundException::new);
-
-        Set<String> features = hotelRepository.findHotelFeatureList();
-        return new HotelFeatureDTO(
-                hotelId,
-                hotel.getName(),
-                features
-        );
-    }
-
-    @Transactional
     public void removeRoom(Long roomId) {
         Room room = roomRepository.findById(roomId)
                         .orElseThrow(RoomNotFoundException::new);
         roomRepository.delete(room);
+    }
+
+    @Transactional
+    public void removeFeature(Long hotelId, Long featureId) {
+        HotelFeature hotelFeature = hotelFeatureRepository.findByHotelIdAndFeatureId(hotelId, featureId)
+                .orElseThrow(FeatureNotFoundException::new);
+        hotelFeatureRepository.delete(hotelFeature);
     }
 }

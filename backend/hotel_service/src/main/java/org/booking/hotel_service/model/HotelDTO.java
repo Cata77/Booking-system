@@ -20,6 +20,6 @@ public record HotelDTO (
         LocalTime checkInTime,
         LocalTime checkOutTime,
         Set<RoomDTO> rooms,
-        Set<String> features
+        Set<FeatureDTO> features
 ) implements Serializable {
 }

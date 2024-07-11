@@ -953,3 +953,7 @@ Xbackend/hotel_service/src/main/java/org/booking/hotel_service/model/HotelFeatur
 dbackend/hotel_service/src/main/java/org/booking/hotel_service/repository/HotelFeatureRepository.java,8\e\8e70dd05887fa320dc7e257df3138d958c939464
 ’
 bbackend/hotel_service/src/main/java/org/booking/hotel_service/exception/RoomNotFoundException.java,1\8\18ed547711b81e9dd62d3e806a25844078c5e564
+ƒ
+Sbackend/hotel_service/src/main/java/org/booking/hotel_service/model/FeatureDTO.java,c\9\c9995f92bcd927bf44a28437674edafd655c566d
+•
+ebackend/hotel_service/src/main/java/org/booking/hotel_service/exception/FeatureNotFoundException.java,6\f\6fdcd418cf2ddd629501d680ae1be84e010c112e

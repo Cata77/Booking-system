@@ -3,6 +3,7 @@ package org.booking.hotel_service.repository;
 import org.booking.hotel_service.model.Hotel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 import java.util.Set;
@@ -18,6 +19,7 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
             ON hotel.id = hf.hotel_id
             JOIN feature
             ON hf.feature_id = feature.id
+            WHERE hotel_id = :hotelId
             """, nativeQuery = true)
-    Set<String> findHotelFeatureList();
+    Set<String> findHotelFeatureList(@Param("hotelId") Long hotelId);
 }

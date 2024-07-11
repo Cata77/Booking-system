@@ -76,29 +76,39 @@ public class HotelController {
     }
 
     @GetMapping("/{hotel_id}/features")
-    @PreAuthorize("hasRole('owner')")
-    public ResponseEntity<HotelFeatureDTO> viewHotelFeatures(
+    @PreAuthorize("hasRole('user')")
+    public ResponseEntity<Set<FeatureDTO>> viewHotelFeatures(
             @PathVariable("hotel_id") Long hotelId
     ) {
-        HotelFeatureDTO features = service.getHotelFeatures(hotelId);
+        Set<FeatureDTO> features = service.getHotelFeatures(hotelId);
         return new ResponseEntity<>(features, HttpStatus.OK);
     }
 
 
     @DeleteMapping("/{hotel_id}")
     @PreAuthorize("hasRole('owner')")
-    public ResponseEntity<?> removeHotel(@PathVariable("hotel_id") Long hotelId) {
+    public ResponseEntity<Void> removeHotel(@PathVariable("hotel_id") Long hotelId) {
         service.removeHotel(hotelId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{hotel_id}/rooms/{room_id}")
     @PreAuthorize("hasRole('owner')")
-    public ResponseEntity<?> removeRoom(
+    public ResponseEntity<Void> removeRoom(
             @PathVariable("hotel_id") Long hotelId,
             @PathVariable("room_id") Long roomId
     ) {
         service.removeRoom(roomId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/{hotel_id}/features/{feature_id}")
+    @PreAuthorize("hasRole('owner')")
+    public ResponseEntity<Void> removeFeature(
+            @PathVariable("hotel_id") Long hotelId,
+            @PathVariable("feature_id") Long featureId
+    ) {
+        service.removeFeature(hotelId, featureId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

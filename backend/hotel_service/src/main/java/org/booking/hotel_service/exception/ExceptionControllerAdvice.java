@@ -31,4 +31,12 @@ public class ExceptionControllerAdvice {
                 .status(HttpStatus.NOT_FOUND)
                 .body(errorDetails);
     }
+
+    @ExceptionHandler(FeatureNotFoundException.class)
+    public ResponseEntity<ErrorDetails> exceptionFeatureNotFoundHandler() {
+        ErrorDetails errorDetails = new ErrorDetails("Feature not found!");
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(errorDetails);
+    }
 }
