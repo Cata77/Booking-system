@@ -193,11 +193,22 @@ public class HotelService {
     }
 
     @Transactional
+    public HotelFeatureDTO getHotelFeatures(Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(HotelNotFoundException::new);
+
+        Set<String> features = hotelRepository.findHotelFeatureList();
+        return new HotelFeatureDTO(
+                hotelId,
+                hotel.getName(),
+                features
+        );
+    }
+
+    @Transactional
     public void removeRoom(Long roomId) {
         Room room = roomRepository.findById(roomId)
                         .orElseThrow(RoomNotFoundException::new);
         roomRepository.delete(room);
     }
-
-
 }
