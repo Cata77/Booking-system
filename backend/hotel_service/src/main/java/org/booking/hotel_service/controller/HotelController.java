@@ -51,6 +51,16 @@ public class HotelController {
         return new ResponseEntity<>(hotelFeature, HttpStatus.CREATED);
     }
 
+    @PutMapping("/{hotel_id}")
+    @PreAuthorize("hasRole('owner')")
+    public ResponseEntity<HotelDTO> updateHotel(
+            @RequestBody Hotel hotel,
+            @PathVariable("hotel_id") Long hotelId
+    ) {
+        HotelDTO hotelDTO = service.updateHotel(hotel, hotelId);
+        return new ResponseEntity<>(hotelDTO, HttpStatus.OK);
+    }
+
     @GetMapping("/{hotel_id}")
     @PreAuthorize("hasRole('user')")
     public ResponseEntity<HotelDTO> viewHotel(@PathVariable("hotel_id") Long hotelId) {

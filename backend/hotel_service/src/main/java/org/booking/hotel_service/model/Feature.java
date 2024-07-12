@@ -23,6 +23,6 @@ public class Feature implements Serializable {
     private Long id;
     private String name;
 
-    @OneToMany(mappedBy = "feature", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "feature", cascade = CascadeType.ALL)
     private Set<HotelFeature> hotelFeatures = new HashSet<>();
 }

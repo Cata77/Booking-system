@@ -65,19 +65,7 @@ public class HotelService {
         hotel.setUserId(userId);
         hotelRepository.save(hotel);
 
-        return HotelDTO.builder()
-                .id(hotel.getId())
-                .name(hotel.getName())
-                .country(hotel.getCountry())
-                .city(hotel.getCity())
-                .address(hotel.getAddress())
-                .hotelCategory(hotel.getHotelCategory())
-                .accommodationType(hotel.getAccommodationType())
-                .propertyType(hotel.getPropertyType())
-                .description(hotel.getDescription())
-                .checkInTime(hotel.getCheckInTime())
-                .checkOutTime(hotel.getCheckOutTime())
-                .build();
+        return getHotelDTO(hotel);
     }
 
     @Transactional
@@ -138,6 +126,15 @@ public class HotelService {
     }
 
     @Transactional
+    @CachePut(cacheNames = "hotels", key = "#hotelId")
+    public HotelDTO updateHotel(Hotel hotel, Long hotelId) {
+        hotel.setId(hotelId);
+        hotelRepository.save(hotel);
+
+        return getHotelDTO(hotel);
+    }
+
+    @Transactional
     @Cacheable(cacheNames = "hotels", key = "#hotelId")
     public HotelDTO viewHotelDetails(Long hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId)
@@ -187,16 +184,6 @@ public class HotelService {
         return roomRepository.findByHotelId(hotelId).stream()
                 .map(room -> createRoomDTO(room, hotel))
                 .collect(Collectors.toSet());
-    }
-
-    private RoomDTO createRoomDTO(Room room, Hotel hotel) {
-        return new RoomDTO(
-                room.getId(),
-                hotel.getName(),
-                room.getBedroomCount(),
-                room.getBedCount(),
-                room.getMaxGuestsCount(),
-                room.getPrice());
     }
 
     @Transactional
@@ -272,5 +259,31 @@ public class HotelService {
         HotelFeature hotelFeature = hotelFeatureRepository.findByHotelIdAndFeatureId(hotelId, featureId)
                 .orElseThrow(FeatureNotFoundException::new);
         hotelFeatureRepository.delete(hotelFeature);
+    }
+
+    private static HotelDTO getHotelDTO(Hotel hotel) {
+        return HotelDTO.builder()
+                .id(hotel.getId())
+                .name(hotel.getName())
+                .country(hotel.getCountry())
+                .city(hotel.getCity())
+                .address(hotel.getAddress())
+                .hotelCategory(hotel.getHotelCategory())
+                .accommodationType(hotel.getAccommodationType())
+                .propertyType(hotel.getPropertyType())
+                .description(hotel.getDescription())
+                .checkInTime(hotel.getCheckInTime())
+                .checkOutTime(hotel.getCheckOutTime())
+                .build();
+    }
+
+    private RoomDTO createRoomDTO(Room room, Hotel hotel) {
+        return new RoomDTO(
+                room.getId(),
+                hotel.getName(),
+                room.getBedroomCount(),
+                room.getBedCount(),
+                room.getMaxGuestsCount(),
+                room.getPrice());
     }
 }
