@@ -61,6 +61,17 @@ public class HotelController {
         return new ResponseEntity<>(hotelDTO, HttpStatus.OK);
     }
 
+    @PutMapping("/{hotel_id}/rooms/{room_id}")
+    @PreAuthorize("hasRole('owner')")
+    public ResponseEntity<RoomDTO> updateHotelRoom(
+            @RequestBody Room room,
+            @PathVariable("room_id") Long roomId,
+            @PathVariable("hotel_id") Long hotelId
+    ) {
+        RoomDTO roomDTO = service.updateHotelRoom(room, roomId, hotelId);
+        return new ResponseEntity<>(roomDTO, HttpStatus.OK);
+    }
+
     @GetMapping("/{hotel_id}")
     @PreAuthorize("hasRole('user')")
     public ResponseEntity<HotelDTO> viewHotel(@PathVariable("hotel_id") Long hotelId) {

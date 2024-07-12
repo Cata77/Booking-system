@@ -130,8 +130,30 @@ public class HotelService {
     public HotelDTO updateHotel(Hotel hotel, Long hotelId) {
         hotel.setId(hotelId);
         hotelRepository.save(hotel);
-
         return getHotelDTO(hotel);
+    }
+
+    @Transactional
+    @Caching(
+            put = {@CachePut(cacheNames = "rooms", key = "#hotelId")},
+            evict = {@CacheEvict(cacheNames = "hotels", key = "#hotelId")}
+    )
+    public RoomDTO updateHotelRoom(Room room, Long roomId, Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(HotelNotFoundException::new);
+
+        room.setId(roomId);
+        room.setHotel(hotel);
+        roomRepository.save(room);
+
+        return new RoomDTO(
+                room.getId(),
+                hotel.getName(),
+                room.getBedroomCount(),
+                room.getBedCount(),
+                room.getMaxGuestsCount(),
+                room.getPrice()
+        );
     }
 
     @Transactional
