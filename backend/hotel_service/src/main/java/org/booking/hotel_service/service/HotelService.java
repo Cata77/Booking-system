@@ -11,7 +11,10 @@ import org.booking.hotel_service.repository.FeatureRepository;
 import org.booking.hotel_service.repository.HotelFeatureRepository;
 import org.booking.hotel_service.repository.HotelRepository;
 import org.booking.hotel_service.repository.RoomRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -36,13 +39,19 @@ public class HotelService {
         return (Jwt) authenticationToken.getCredentials();
     }
 
-    @CachePut(value = "features", key = "#feature.id")
-    public void createFeature(Feature feature) {
+    @Transactional
+    @CachePut(cacheNames = "features", key = "#feature.id")
+    public FeatureDTO createFeature(Feature feature) {
         featureRepository.save(feature);
+
+        return new FeatureDTO(
+                feature.getId(),
+                feature.getName()
+        );
     }
 
     @Transactional
-    @CachePut(value = "hotels", key = "#hotel.id")
+    @CachePut(cacheNames = "hotels", key = "#hotel.id")
     public HotelDTO createHotel(Hotel hotel) {
         Jwt jwt = extractJWT();
         String subject = (String) jwt.getClaims().get("sub");
@@ -72,7 +81,10 @@ public class HotelService {
     }
 
     @Transactional
-    @CachePut(value = "rooms", key = "#room.id")
+    @Caching(
+            put = {@CachePut(cacheNames = "rooms", key = "#hotelId")},
+            evict = {@CacheEvict(cacheNames = "hotels", key = "#hotelId")}
+    )
     public RoomDTO createHotelRoom(Room room, Long hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(HotelNotFoundException::new);
@@ -91,7 +103,10 @@ public class HotelService {
     }
 
     @Transactional
-    @CachePut(value = "hotel_feature", key = "#result.id")
+    @Caching(
+            put = {@CachePut(cacheNames = "hotel_features", key = "#hotelId")},
+            evict = {@CacheEvict(cacheNames = "hotels", key = "#hotelId")}
+    )
     public HotelFeatureDTO addHotelFeatures(Long hotelId, Set<Feature> features) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(HotelNotFoundException::new);
@@ -123,7 +138,7 @@ public class HotelService {
     }
 
     @Transactional
-//    @Cacheable(value = "hotels", key = "#hotelId")
+    @Cacheable(cacheNames = "hotels", key = "#hotelId")
     public HotelDTO viewHotelDetails(Long hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(HotelNotFoundException::new);
@@ -164,6 +179,7 @@ public class HotelService {
                 .build();
     }
 
+    @Transactional
     public Set<RoomDTO> viewHotelRooms(Long hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(HotelNotFoundException::new);
@@ -184,6 +200,7 @@ public class HotelService {
     }
 
     @Transactional
+    @Cacheable(cacheNames = "rooms", key = "#hotelId")
     public RoomDTO viewRoom(Long hotelId, Long roomId) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(HotelNotFoundException::new);
@@ -211,6 +228,13 @@ public class HotelService {
     }
 
     @Transactional
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = "rooms", key = "#hotelId"),
+                    @CacheEvict(cacheNames = "hotel_features", key = "#hotelId"),
+                    @CacheEvict(cacheNames = "hotels", key = "#hotelId")
+            }
+    )
     public void removeHotel(Long hotelId) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(HotelNotFoundException::new);
@@ -225,13 +249,25 @@ public class HotelService {
     }
 
     @Transactional
-    public void removeRoom(Long roomId) {
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = "rooms", key = "#hotelId"),
+                    @CacheEvict(cacheNames = "hotels", key = "#hotelId")
+            }
+    )
+    public void removeRoom(Long hotelId, Long roomId) {
         Room room = roomRepository.findById(roomId)
                         .orElseThrow(RoomNotFoundException::new);
         roomRepository.delete(room);
     }
 
     @Transactional
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = "hotel_features", key = "#hotelId"),
+                    @CacheEvict(cacheNames = "hotels", key = "#hotelId")
+            }
+    )
     public void removeFeature(Long hotelId, Long featureId) {
         HotelFeature hotelFeature = hotelFeatureRepository.findByHotelIdAndFeatureId(hotelId, featureId)
                 .orElseThrow(FeatureNotFoundException::new);

@@ -19,9 +19,9 @@ public class HotelController {
 
     @PostMapping("/features")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<String> addNewHotelFeature(@RequestBody Feature feature) {
-        service.createFeature(feature);
-        return new ResponseEntity<>("Feature created!", HttpStatus.CREATED);
+    public ResponseEntity<FeatureDTO> addNewHotelFeature(@RequestBody Feature feature) {
+        FeatureDTO featureDTO = service.createFeature(feature);
+        return new ResponseEntity<>(featureDTO, HttpStatus.CREATED);
     }
 
     @PostMapping
@@ -98,7 +98,7 @@ public class HotelController {
             @PathVariable("hotel_id") Long hotelId,
             @PathVariable("room_id") Long roomId
     ) {
-        service.removeRoom(roomId);
+        service.removeRoom(hotelId, roomId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
