@@ -1,11 +1,12 @@
 package org.booking.booking_service.service;
 
 import jakarta.transaction.Transactional;
-import org.booking.booking_service.model.Booking;
-import org.booking.booking_service.model.BookingDTO;
-import org.booking.booking_service.model.RoomDTO;
+import org.booking.booking_service.model.*;
 import org.booking.booking_service.repository.BookingRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -33,7 +35,10 @@ public class BookingService {
     }
 
     @Transactional
-    @CachePut(cacheNames = "bookings", key = "#booking.id")
+    @Caching(
+            put = {@CachePut(cacheNames = "bookings", key = "#booking.id")},
+            evict = {@CacheEvict(cacheNames = "unavailable-dates", key = "#booking.roomId")}
+    )
     public BookingDTO createBooking(Booking booking) {
         Jwt jwt = extractJWT();
         String subject = (String) jwt.getClaims().get("sub");
@@ -51,6 +56,8 @@ public class BookingService {
         //future payout calculation and exception handling
 
         booking.setUserId(userId);
+        booking.setStatus(Status.ACCEPTED);
+        booking.setPayout(BigDecimal.valueOf(200));
         bookingRepository.save(booking);
 
         return new BookingDTO(
@@ -61,7 +68,13 @@ public class BookingService {
                 booking.getCheckOutDate(),
                 booking.getGuestCount(),
                 roomDTO,
-                new BigDecimal(200)
+                new BigDecimal(200),
+                booking.getStatus()
         );
+    }
+
+    @Cacheable(cacheNames = "unavailable-dates", key = "#roomId")
+    public List<DateRangeDTO> getUnavailableDates(Long roomId) {
+        return bookingRepository.getBookingDatesByRoomId(roomId);
     }
 }

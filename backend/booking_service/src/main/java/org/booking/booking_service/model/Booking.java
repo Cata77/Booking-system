@@ -27,4 +27,7 @@ public class Booking implements Serializable {
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private int guestCount;
+    private BigDecimal payout;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 }

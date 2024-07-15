@@ -983,3 +983,7 @@ Tbackend/booking_service/src/main/java/org/booking/booking_service/model/RoomDto
 Tbackend/booking_service/src/main/java/org/booking/booking_service/model/RoomDTO.java,3\8\3807ecd8048b1f2a793bb9d58bf2e1cbb897b41f
 ‡
 Wbackend/booking_service/src/main/java/org/booking/booking_service/model/BookingDTO.java,0\4\04bfb4009b78d7b3ed54dbbd0e66d3cc0d2da058
+‰
+Ybackend/booking_service/src/main/java/org/booking/booking_service/model/DateRangeDto.java,8\6\861ffd0e35666581ef675892775d40159ddb4df7
+‰
+Ybackend/booking_service/src/main/java/org/booking/booking_service/model/DateRangeDTO.java,d\b\db651d31546a49ee77f170bc361ce376b075bd83

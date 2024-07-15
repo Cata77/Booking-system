@@ -15,6 +15,7 @@ public record BookingDTO(
         LocalDate checkOutDate,
         int guestCount,
         RoomDTO room,
-        BigDecimal payout
+        BigDecimal payout,
+        Status status
 ) implements Serializable {
 }
