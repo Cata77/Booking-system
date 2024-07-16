@@ -987,3 +987,11 @@ Wbackend/booking_service/src/main/java/org/booking/booking_service/model/Booking
 Ybackend/booking_service/src/main/java/org/booking/booking_service/model/DateRangeDto.java,8\6\861ffd0e35666581ef675892775d40159ddb4df7
 â
 Ybackend/booking_service/src/main/java/org/booking/booking_service/model/DateRangeDTO.java,d\b\db651d31546a49ee77f170bc361ce376b075bd83
+ö
+jbackend/booking_service/src/main/java/org/booking/booking_service/exception/ExceptionControllerAdvice.java,2\0\20b54dcd555f104d3ba7b2047e584614475fcbb1
+ù
+mbackend/booking_service/src/main/java/org/booking/booking_service/exception/ExceedsRoomCapacityException.java,e\9\e91de52e3469498493ca54e177863f5bb04a5fa4
+ç
+]backend/booking_service/src/main/java/org/booking/booking_service/exception/ErrorDetails.java,1\9\194c7c1a5362aed3729dc78b39d2c4dcd9612a52
+¶
+vbackend/booking_service/src/main/java/org/booking/booking_service/exception/DependentServiceNotAvailableException.java,2\1\21dce2337e24eed86cf4de41c9516e2bddfa0276

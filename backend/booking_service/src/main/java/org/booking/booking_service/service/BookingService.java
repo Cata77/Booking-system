@@ -1,6 +1,8 @@
 package org.booking.booking_service.service;
 
 import jakarta.transaction.Transactional;
+import org.booking.booking_service.exception.DependentServiceNotAvailableException;
+import org.booking.booking_service.exception.ExceedsRoomCapacityException;
 import org.booking.booking_service.model.*;
 import org.booking.booking_service.repository.BookingRepository;
 import org.springframework.cache.annotation.CacheEvict;
@@ -13,8 +15,11 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import javax.naming.ServiceUnavailableException;
 import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -48,29 +53,50 @@ public class BookingService {
                 .defaultHeader("Authorization", "Bearer " + jwt.getTokenValue())
                 .build();
 
-        RoomDTO roomDTO = authenticatedClient.get()
-                .uri("/{hotel_id}/rooms/{room_id}", booking.getHotelId(), booking.getRoomId())
-                .retrieve()
-                .body(RoomDTO.class);
+        try {
+            RoomDTO roomDTO = authenticatedClient.get()
+                    .uri("/{hotel_id}/rooms/{room_id}", booking.getHotelId(), booking.getRoomId())
+                    .retrieve()
+                    .body(RoomDTO.class);
 
-        //future payout calculation and exception handling
+            Optional<RoomDTO> optionalRoomDTO = Optional.ofNullable(roomDTO);
+            optionalRoomDTO.orElseThrow(() -> new ServiceUnavailableException("Unable to retrieve room information"));
 
-        booking.setUserId(userId);
-        booking.setStatus(Status.ACCEPTED);
-        booking.setPayout(BigDecimal.valueOf(200));
-        bookingRepository.save(booking);
+            if (booking.getGuestCount() > roomDTO.maxGuestsCount()) {
+                throw new ExceedsRoomCapacityException();
+            }
 
-        return new BookingDTO(
-                booking.getId(),
-                userId,
-                roomDTO.hotelName(),
-                booking.getCheckInDate(),
-                booking.getCheckOutDate(),
-                booking.getGuestCount(),
-                roomDTO,
-                new BigDecimal(200),
-                booking.getStatus()
-        );
+            long bookedDays = ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
+            BigDecimal payout = BigDecimal.valueOf(bookedDays).multiply(roomDTO.price());
+            BigDecimal discount = BigDecimal.ZERO;
+            if (bookedDays >= 7) {
+                discount = (payout.multiply(BigDecimal.valueOf(0.05)));
+                payout = payout.subtract(discount);
+            }
+
+            booking.setUserId(userId);
+            booking.setDiscount(discount);
+            booking.setPayout(payout);
+            booking.setStatus(Status.ACCEPTED);
+            bookingRepository.save(booking);
+
+            return new BookingDTO(
+                    booking.getId(),
+                    userId,
+                    roomDTO.hotelName(),
+                    booking.getCheckInDate(),
+                    booking.getCheckOutDate(),
+                    booking.getGuestCount(),
+                    roomDTO,
+                    discount,
+                    payout,
+                    booking.getStatus()
+            );
+        } catch (ExceedsRoomCapacityException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new DependentServiceNotAvailableException();
+        }
     }
 
     @Cacheable(cacheNames = "unavailable-dates", key = "#roomId")
