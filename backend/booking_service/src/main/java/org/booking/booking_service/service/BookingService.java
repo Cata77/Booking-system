@@ -1,6 +1,7 @@
 package org.booking.booking_service.service;
 
 import jakarta.transaction.Transactional;
+import org.booking.booking_service.exception.BookingNotFoundException;
 import org.booking.booking_service.exception.DependentServiceNotAvailableException;
 import org.booking.booking_service.exception.ExceedsRoomCapacityException;
 import org.booking.booking_service.model.*;
@@ -102,5 +103,38 @@ public class BookingService {
     @Cacheable(cacheNames = "unavailable-dates", key = "#roomId")
     public List<DateRangeDTO> getUnavailableDates(Long roomId) {
         return bookingRepository.getBookingDatesByRoomId(roomId);
+    }
+
+    @Transactional
+    @CachePut(cacheNames = "bookings", key = "#bookingId")
+    public BookingDTO getBooking(Long bookingId) throws ServiceUnavailableException {
+        Jwt jwt = extractJWT();
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(BookingNotFoundException::new);
+
+        RestClient authenticatedClient = restClientBuilder
+                .defaultHeader("Authorization", "Bearer " + jwt.getTokenValue())
+                .build();
+
+        RoomDTO roomDTO = authenticatedClient.get()
+                .uri("/{hotel_id}/rooms/{room_id}", booking.getHotelId(), booking.getRoomId())
+                .retrieve()
+                .body(RoomDTO.class);
+
+        Optional<RoomDTO> optionalRoomDTO = Optional.ofNullable(roomDTO);
+        optionalRoomDTO.orElseThrow(() -> new ServiceUnavailableException("Unable to retrieve room information"));
+
+        return new BookingDTO(
+                bookingId,
+                booking.getUserId(),
+                roomDTO.hotelName(),
+                booking.getCheckInDate(),
+                booking.getCheckOutDate(),
+                booking.getGuestCount(),
+                roomDTO,
+                booking.getDiscount(),
+                booking.getPayout(),
+                booking.getStatus()
+        );
     }
 }

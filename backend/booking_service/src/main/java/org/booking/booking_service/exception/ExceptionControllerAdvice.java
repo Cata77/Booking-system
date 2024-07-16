@@ -23,4 +23,12 @@ public class ExceptionControllerAdvice {
                 .status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(errorDetails);
     }
+
+    @ExceptionHandler(BookingNotFoundException.class)
+    public ResponseEntity<ErrorDetails> bookingNotFoundHandler() {
+        ErrorDetails errorDetails = new ErrorDetails("Booking not found!");
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(errorDetails);
+    }
 }

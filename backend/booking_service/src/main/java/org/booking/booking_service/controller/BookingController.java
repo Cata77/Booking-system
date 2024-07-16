@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import javax.naming.ServiceUnavailableException;
 import java.util.List;
 
 @RestController
@@ -32,5 +32,12 @@ public class BookingController {
     public ResponseEntity<List<DateRangeDTO>> getUnavailableDates(@PathVariable("roomId") Long roomId) {
         List<DateRangeDTO> unavailableDates = service.getUnavailableDates(roomId);
         return new ResponseEntity<>(unavailableDates, HttpStatus.OK);
+    }
+
+    @GetMapping("/{bookingId}")
+    @PreAuthorize("hasRole('user')")
+    public ResponseEntity<BookingDTO> getBooking(@PathVariable("bookingId") Long bookingId) throws ServiceUnavailableException {
+        BookingDTO bookingDTO = service.getBooking(bookingId);
+        return new ResponseEntity<>(bookingDTO, HttpStatus.OK);
     }
 }

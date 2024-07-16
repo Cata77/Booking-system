@@ -995,3 +995,7 @@ mbackend/booking_service/src/main/java/org/booking/booking_service/exception/Exc
 ]backend/booking_service/src/main/java/org/booking/booking_service/exception/ErrorDetails.java,1\9\194c7c1a5362aed3729dc78b39d2c4dcd9612a52
 ¦
 vbackend/booking_service/src/main/java/org/booking/booking_service/exception/DependentServiceNotAvailableException.java,2\1\21dce2337e24eed86cf4de41c9516e2bddfa0276
+™
+ibackend/booking_service/src/main/java/org/booking/booking_service/exception/BookingNotFoundException.java,f\e\fec88d394546e170fa76ce850f7a9cc5be2ed748
+‹
+[backend/booking_service/src/main/java/org/booking/booking_service/service/HotelService.java,0\d\0d66e4340f54b8f115c488e1e530d02f3f69685f
