@@ -32,3 +32,7 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:8080/realms/Booking-System/protocol/openid-connect/certs
+
+hotel:
+  service:
+    url: http://localhost:8222/hotels

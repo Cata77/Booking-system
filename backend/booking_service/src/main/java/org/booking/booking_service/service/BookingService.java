@@ -1,8 +1,9 @@
 package org.booking.booking_service.service;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.booking.booking_service.config.JwtUtil;
 import org.booking.booking_service.exception.BookingNotFoundException;
-import org.booking.booking_service.exception.DependentServiceNotAvailableException;
 import org.booking.booking_service.exception.ExceedsRoomCapacityException;
 import org.booking.booking_service.model.*;
 import org.booking.booking_service.repository.BookingRepository;
@@ -10,35 +11,21 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
-import javax.naming.ServiceUnavailableException;
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BookingService {
 
     private final BookingRepository bookingRepository;
-    private final RestClient.Builder restClientBuilder;
-
-    public BookingService(BookingRepository bookingRepository) {
-        this.bookingRepository = bookingRepository;
-        this.restClientBuilder = RestClient.builder()
-                .baseUrl("http://localhost:8222/hotels");
-    }
-
-    private Jwt extractJWT() {
-        JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        return (Jwt) authenticationToken.getCredentials();
-    }
+    private final HotelService hotelService;
+    private final BookingMapper bookingMapper;
+    private final JwtUtil jwtUtil;
 
     @Transactional
     @Caching(
@@ -46,58 +33,14 @@ public class BookingService {
             evict = {@CacheEvict(cacheNames = "unavailable-dates", key = "#booking.roomId")}
     )
     public BookingDTO createBooking(Booking booking) {
-        Jwt jwt = extractJWT();
-        String subject = (String) jwt.getClaims().get("sub");
-        UUID userId = UUID.fromString(subject);
+        UUID userId = jwtUtil.extractUserId();
+        RoomDTO roomDTO = hotelService.getRoomDetails(booking.getHotelId(), booking.getRoomId());
 
-        RestClient authenticatedClient = restClientBuilder
-                .defaultHeader("Authorization", "Bearer " + jwt.getTokenValue())
-                .build();
+        validateBooking(booking, roomDTO);
 
-        try {
-            RoomDTO roomDTO = authenticatedClient.get()
-                    .uri("/{hotel_id}/rooms/{room_id}", booking.getHotelId(), booking.getRoomId())
-                    .retrieve()
-                    .body(RoomDTO.class);
+        Booking savedBooking = createAndSaveBooking(booking, userId, roomDTO);
 
-            Optional<RoomDTO> optionalRoomDTO = Optional.ofNullable(roomDTO);
-            optionalRoomDTO.orElseThrow(() -> new ServiceUnavailableException("Unable to retrieve room information"));
-
-            if (booking.getGuestCount() > roomDTO.maxGuestsCount()) {
-                throw new ExceedsRoomCapacityException();
-            }
-
-            long bookedDays = ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
-            BigDecimal payout = BigDecimal.valueOf(bookedDays).multiply(roomDTO.price());
-            BigDecimal discount = BigDecimal.ZERO;
-            if (bookedDays >= 7) {
-                discount = (payout.multiply(BigDecimal.valueOf(0.05)));
-                payout = payout.subtract(discount);
-            }
-
-            booking.setUserId(userId);
-            booking.setDiscount(discount);
-            booking.setPayout(payout);
-            booking.setStatus(Status.ACCEPTED);
-            bookingRepository.save(booking);
-
-            return new BookingDTO(
-                    booking.getId(),
-                    userId,
-                    roomDTO.hotelName(),
-                    booking.getCheckInDate(),
-                    booking.getCheckOutDate(),
-                    booking.getGuestCount(),
-                    roomDTO,
-                    discount,
-                    payout,
-                    booking.getStatus()
-            );
-        } catch (ExceedsRoomCapacityException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new DependentServiceNotAvailableException();
-        }
+        return bookingMapper.toDTO(savedBooking, roomDTO);
     }
 
     @Cacheable(cacheNames = "unavailable-dates", key = "#roomId")
@@ -107,34 +50,42 @@ public class BookingService {
 
     @Transactional
     @CachePut(cacheNames = "bookings", key = "#bookingId")
-    public BookingDTO getBooking(Long bookingId) throws ServiceUnavailableException {
-        Jwt jwt = extractJWT();
+    public BookingDTO getBooking(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(BookingNotFoundException::new);
 
-        RestClient authenticatedClient = restClientBuilder
-                .defaultHeader("Authorization", "Bearer " + jwt.getTokenValue())
-                .build();
+        RoomDTO roomDTO = hotelService.getRoomDetails(booking.getHotelId(), booking.getRoomId());
 
-        RoomDTO roomDTO = authenticatedClient.get()
-                .uri("/{hotel_id}/rooms/{room_id}", booking.getHotelId(), booking.getRoomId())
-                .retrieve()
-                .body(RoomDTO.class);
+        return bookingMapper.toDTO(booking, roomDTO);
+    }
 
-        Optional<RoomDTO> optionalRoomDTO = Optional.ofNullable(roomDTO);
-        optionalRoomDTO.orElseThrow(() -> new ServiceUnavailableException("Unable to retrieve room information"));
+    private void validateBooking(Booking booking, RoomDTO roomDTO) {
+        if (booking.getGuestCount() > roomDTO.maxGuestsCount()) {
+            throw new ExceedsRoomCapacityException();
+        }
+    }
 
-        return new BookingDTO(
-                bookingId,
-                booking.getUserId(),
-                roomDTO.hotelName(),
-                booking.getCheckInDate(),
-                booking.getCheckOutDate(),
-                booking.getGuestCount(),
-                roomDTO,
-                booking.getDiscount(),
-                booking.getPayout(),
-                booking.getStatus()
-        );
+    private Booking createAndSaveBooking(Booking booking, UUID userId, RoomDTO roomDTO) {
+        long bookedDays = ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
+        BigDecimal payout = calculatePayout(bookedDays, roomDTO.price());
+        BigDecimal discount = calculateDiscount(payout, bookedDays);
+
+        booking.setUserId(userId);
+        booking.setDiscount(discount);
+        booking.setPayout(payout.subtract(discount));
+        booking.setStatus(Status.ACCEPTED);
+
+        return bookingRepository.save(booking);
+    }
+
+    private BigDecimal calculatePayout(long bookedDays, BigDecimal roomPrice) {
+        return BigDecimal.valueOf(bookedDays).multiply(roomPrice);
+    }
+
+    private BigDecimal calculateDiscount(BigDecimal payout, long bookedDays) {
+        if (bookedDays >= 7) {
+            return payout.multiply(BigDecimal.valueOf(0.05));
+        }
+        return BigDecimal.ZERO;
     }
 }
