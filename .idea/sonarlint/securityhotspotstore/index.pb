@@ -1003,3 +1003,5 @@ ibackend/booking_service/src/main/java/org/booking/booking_service/exception/Boo
 Ubackend/booking_service/src/main/java/org/booking/booking_service/config/JwtUtil.java,8\4\84a060610423aa46653734ad527103f068906da7
 å
 \backend/booking_service/src/main/java/org/booking/booking_service/service/BookingMapper.java,e\f\ef4d442869aff11d2dc10e0cc49803e1d7ae50bf
+ç
+]backend/booking_service/src/main/java/org/booking/booking_service/model/BookingUpdateDTO.java,9\5\95e649bac816e201a63ed3342cbc1b118a04d1c9

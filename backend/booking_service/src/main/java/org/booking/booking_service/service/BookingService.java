@@ -43,13 +43,60 @@ public class BookingService {
         return bookingMapper.toDTO(savedBooking, roomDTO);
     }
 
+    @Transactional
+    @CachePut(cacheNames = "bookings", key = "#bookingId")
+    public BookingDTO updateBooking(Long bookingId, BookingUpdateDTO updateDTO) {
+        Booking existingBooking = bookingRepository.findById(bookingId)
+                .orElseThrow(BookingNotFoundException::new);
+
+        if (updateDTO.status() != null && updateDTO.status() == Status.CANCELED) {
+            existingBooking.setStatus(Status.CANCELED);
+            Booking updatedBooking = bookingRepository.save(existingBooking);
+            RoomDTO roomDTO = hotelService.getRoomDetails(updatedBooking.getHotelId(), updatedBooking.getRoomId());
+            return bookingMapper.toDTO(updatedBooking, roomDTO);
+        }
+
+        boolean needsPayoutRecalculation = false;
+
+        if (updateDTO.checkInDate() != null && !updateDTO.checkInDate().equals(existingBooking.getCheckInDate())) {
+            existingBooking.setCheckInDate(updateDTO.checkInDate());
+            needsPayoutRecalculation = true;
+        }
+
+        if (updateDTO.checkOutDate() != null && !updateDTO.checkOutDate().equals(existingBooking.getCheckOutDate())) {
+            existingBooking.setCheckOutDate(updateDTO.checkOutDate());
+            needsPayoutRecalculation = true;
+        }
+
+        if (updateDTO.guestCount() != null && !updateDTO.guestCount().equals(existingBooking.getGuestCount())) {
+            existingBooking.setGuestCount(updateDTO.guestCount());
+        }
+
+        if (needsPayoutRecalculation) {
+            RoomDTO roomDTO = hotelService.getRoomDetails(existingBooking.getHotelId(), existingBooking.getRoomId());
+            validateBooking(existingBooking, roomDTO);
+
+            long bookedDays = ChronoUnit.DAYS.between(existingBooking.getCheckInDate(), existingBooking.getCheckOutDate());
+            BigDecimal payout = calculatePayout(bookedDays, roomDTO.price());
+            BigDecimal discount = calculateDiscount(payout, bookedDays);
+
+            existingBooking.setDiscount(discount);
+            existingBooking.setPayout(payout.subtract(discount));
+        }
+
+        Booking updatedBooking = bookingRepository.save(existingBooking);
+        RoomDTO roomDTO = hotelService.getRoomDetails(updatedBooking.getHotelId(), updatedBooking.getRoomId());
+
+        return bookingMapper.toDTO(updatedBooking, roomDTO);
+    }
+
     @Cacheable(cacheNames = "unavailable-dates", key = "#roomId")
     public List<DateRangeDTO> getUnavailableDates(Long roomId) {
         return bookingRepository.getBookingDatesByRoomId(roomId);
     }
 
     @Transactional
-    @CachePut(cacheNames = "bookings", key = "#bookingId")
+    @Cacheable(cacheNames = "bookings", key = "#bookingId")
     public BookingDTO getBooking(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(BookingNotFoundException::new);
