@@ -1005,3 +1005,7 @@ Ubackend/booking_service/src/main/java/org/booking/booking_service/config/JwtUti
 \backend/booking_service/src/main/java/org/booking/booking_service/service/BookingMapper.java,e\f\ef4d442869aff11d2dc10e0cc49803e1d7ae50bf
 ç
 ]backend/booking_service/src/main/java/org/booking/booking_service/model/BookingUpdateDTO.java,9\5\95e649bac816e201a63ed3342cbc1b118a04d1c9
+M
+logstash/config/usersync.conf,5\f\5fb48d8ca7ba71e7f94a8da35f38b46f580f0599
+C
+logstash/Dockerfile,0\5\05fb195fd109de6075a36b57d29466590d9d09d7
