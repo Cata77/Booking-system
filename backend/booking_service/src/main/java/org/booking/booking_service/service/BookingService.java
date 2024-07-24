@@ -2,7 +2,7 @@ package org.booking.booking_service.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.booking.booking_service.config.JwtUtil;
+import org.booking.booking_service.utils.JwtUtil;
 import org.booking.booking_service.exception.BookingNotFoundException;
 import org.booking.booking_service.exception.ExceedsRoomCapacityException;
 import org.booking.booking_service.model.*;

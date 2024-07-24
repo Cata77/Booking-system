@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Set;
 import java.util.UUID;
@@ -41,4 +42,6 @@ public class Hotel implements Serializable {
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
     private Set<HotelFeature> hotelFeatures;
+
+    private LocalDateTime lastUpdate;
 }

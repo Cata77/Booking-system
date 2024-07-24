@@ -31,103 +31,103 @@ public class HotelController {
         return new ResponseEntity<>(createdHotel, HttpStatus.CREATED);
     }
 
-    @PostMapping("/{hotel_id}/rooms")
+    @PostMapping("/{hotelId}/rooms")
     @PreAuthorize("hasRole('owner')")
     public ResponseEntity<RoomDTO> addHotelRooms(
-            @PathVariable("hotel_id") Long hotelId,
+            @PathVariable("hotelId") Long hotelId,
             @RequestBody Room room
     ) {
         RoomDTO createdRoom = service.createHotelRoom(room, hotelId);
         return new ResponseEntity<>(createdRoom, HttpStatus.CREATED);
     }
 
-    @PostMapping("/{hotel_id}/features")
+    @PostMapping("/{hotelId}/features")
     @PreAuthorize("hasRole('owner')")
     public ResponseEntity<HotelFeatureDTO> addHotelFeatures(
-            @PathVariable("hotel_id") Long hotelId,
+            @PathVariable("hotelId") Long hotelId,
             @RequestBody Set<Feature> features
     ) {
         HotelFeatureDTO hotelFeature = service.addHotelFeatures(hotelId, features);
         return new ResponseEntity<>(hotelFeature, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{hotel_id}")
+    @PutMapping("/{hotelId}")
     @PreAuthorize("hasRole('owner')")
     public ResponseEntity<HotelDTO> updateHotel(
             @RequestBody Hotel hotel,
-            @PathVariable("hotel_id") Long hotelId
+            @PathVariable("hotelId") Long hotelId
     ) {
         HotelDTO hotelDTO = service.updateHotel(hotel, hotelId);
         return new ResponseEntity<>(hotelDTO, HttpStatus.OK);
     }
 
-    @PutMapping("/{hotel_id}/rooms/{room_id}")
+    @PutMapping("/{hotelId}/rooms/{roomId}")
     @PreAuthorize("hasRole('owner')")
     public ResponseEntity<RoomDTO> updateHotelRoom(
             @RequestBody Room room,
-            @PathVariable("room_id") Long roomId,
-            @PathVariable("hotel_id") Long hotelId
+            @PathVariable("roomId") Long roomId,
+            @PathVariable("hotelId") Long hotelId
     ) {
         RoomDTO roomDTO = service.updateHotelRoom(room, roomId, hotelId);
         return new ResponseEntity<>(roomDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/{hotel_id}")
+    @GetMapping("/{hotelId}")
     @PreAuthorize("hasRole('user')")
-    public ResponseEntity<HotelDTO> viewHotel(@PathVariable("hotel_id") Long hotelId) {
+    public ResponseEntity<HotelDTO> viewHotel(@PathVariable("hotelId") Long hotelId) {
         HotelDTO hotelDTO = service.viewHotelDetails(hotelId);
         return new ResponseEntity<>(hotelDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/{hotel_id}/rooms")
+    @GetMapping("/{hotelId}/rooms")
     @PreAuthorize("hasRole('user')")
-    public ResponseEntity<Set<RoomDTO>> viewHotelRooms(@PathVariable("hotel_id") Long hotelId) {
+    public ResponseEntity<Set<RoomDTO>> viewHotelRooms(@PathVariable("hotelId") Long hotelId) {
         Set<RoomDTO> rooms = service.viewHotelRooms(hotelId);
         return new ResponseEntity<>(rooms, HttpStatus.OK);
     }
 
-    @GetMapping("/{hotel_id}/rooms/{room_id}")
+    @GetMapping("/{hotelId}/rooms/{roomId}")
     @PreAuthorize("hasRole('user')")
     public ResponseEntity<RoomDTO> viewRoom(
-            @PathVariable("hotel_id") Long hotelId,
-            @PathVariable("room_id") Long roomId
+            @PathVariable("hotelId") Long hotelId,
+            @PathVariable("roomId") Long roomId
     ) {
         RoomDTO room = service.viewRoom(hotelId, roomId);
         return new ResponseEntity<>(room, HttpStatus.OK);
     }
 
-    @GetMapping("/{hotel_id}/features")
+    @GetMapping("/{hotelId}/features")
     @PreAuthorize("hasRole('user')")
     public ResponseEntity<Set<FeatureDTO>> viewHotelFeatures(
-            @PathVariable("hotel_id") Long hotelId
+            @PathVariable("hotelId") Long hotelId
     ) {
         Set<FeatureDTO> features = service.getHotelFeatures(hotelId);
         return new ResponseEntity<>(features, HttpStatus.OK);
     }
 
 
-    @DeleteMapping("/{hotel_id}")
+    @DeleteMapping("/{hotelId}")
     @PreAuthorize("hasRole('owner')")
-    public ResponseEntity<Void> removeHotel(@PathVariable("hotel_id") Long hotelId) {
+    public ResponseEntity<Void> removeHotel(@PathVariable("hotelId") Long hotelId) {
         service.removeHotel(hotelId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/{hotel_id}/rooms/{room_id}")
+    @DeleteMapping("/{hotelId}/rooms/{roomId}")
     @PreAuthorize("hasRole('owner')")
     public ResponseEntity<Void> removeRoom(
-            @PathVariable("hotel_id") Long hotelId,
-            @PathVariable("room_id") Long roomId
+            @PathVariable("hotelId") Long hotelId,
+            @PathVariable("roomId") Long roomId
     ) {
         service.removeRoom(hotelId, roomId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/{hotel_id}/features/{feature_id}")
+    @DeleteMapping("/{hotelId}/features/{featureId}")
     @PreAuthorize("hasRole('owner')")
     public ResponseEntity<Void> removeFeature(
-            @PathVariable("hotel_id") Long hotelId,
-            @PathVariable("feature_id") Long featureId
+            @PathVariable("hotelId") Long hotelId,
+            @PathVariable("featureId") Long featureId
     ) {
         service.removeFeature(hotelId, featureId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

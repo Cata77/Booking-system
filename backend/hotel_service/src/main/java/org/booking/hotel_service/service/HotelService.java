@@ -11,15 +11,14 @@ import org.booking.hotel_service.repository.FeatureRepository;
 import org.booking.hotel_service.repository.HotelFeatureRepository;
 import org.booking.hotel_service.repository.HotelRepository;
 import org.booking.hotel_service.repository.RoomRepository;
+import org.booking.hotel_service.utils.JwtUtil;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -33,29 +32,24 @@ public class HotelService {
     private final RoomRepository roomRepository;
     private final FeatureRepository featureRepository;
     private final HotelFeatureRepository hotelFeatureRepository;
-
-    private Jwt extractJWT() {
-        JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        return (Jwt) authenticationToken.getCredentials();
-    }
+    private final HotelFeatureMapper hotelFeatureMapper;
+    private final FeatureMapper featureMapper;
+    private final HotelMapper hotelMapper;
+    private final RoomMapper roomMapper;
+    private final JwtUtil jwtUtil;
 
     @Transactional
     @CachePut(cacheNames = "features", key = "#feature.id")
     public FeatureDTO createFeature(Feature feature) {
         featureRepository.save(feature);
 
-        return new FeatureDTO(
-                feature.getId(),
-                feature.getName()
-        );
+        return featureMapper.toDTO(feature);
     }
 
     @Transactional
     @CachePut(cacheNames = "hotels", key = "#hotel.id")
     public HotelDTO createHotel(Hotel hotel) {
-        Jwt jwt = extractJWT();
-        String subject = (String) jwt.getClaims().get("sub");
-        UUID userId = UUID.fromString(subject);
+        UUID userId = jwtUtil.extractUserId();
 
         hotelRepository.findByNameAndAddressAndUserId(hotel.getName(), hotel.getAddress(), userId)
                 .ifPresent(existingHotel -> {
@@ -63,9 +57,10 @@ public class HotelService {
                 });
 
         hotel.setUserId(userId);
+        hotel.setLastUpdate(LocalDateTime.now());
         hotelRepository.save(hotel);
 
-        return getHotelDTO(hotel);
+        return hotelMapper.toDTO(hotel);
     }
 
     @Transactional
@@ -77,17 +72,11 @@ public class HotelService {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(HotelNotFoundException::new);
 
+        amendLastUpdate(hotel);
         room.setHotel(hotel);
         roomRepository.save(room);
 
-        return new RoomDTO(
-                room.getId(),
-                hotel.getName(),
-                room.getBedroomCount(),
-                room.getBedCount(),
-                room.getMaxGuestsCount(),
-                room.getPrice()
-        );
+        return roomMapper.toDTO(room, hotel);
     }
 
     @Transactional
@@ -105,32 +94,19 @@ public class HotelService {
 
         hotelFeatureRepository.saveAll(hotelFeatures);
         Set<FeatureDTO> featureDTOS = features.stream()
-                .map(feature -> new FeatureDTO(
-                        feature.getId(),
-                        feature.getName()
-                ))
+                .map(featureMapper::toDTO)
                 .collect(Collectors.toSet());
 
-        return new HotelFeatureDTO(
-                hotelId,
-                hotel.getName(),
-                featureDTOS
-        );
-    }
-
-    private HotelFeature createHotelFeature(Hotel hotel, Feature feature) {
-        HotelFeature hotelFeature = new HotelFeature();
-        hotelFeature.setHotel(hotel);
-        hotelFeature.setFeature(feature);
-        return hotelFeature;
+        amendLastUpdate(hotel);
+        return hotelFeatureMapper.toDTO(hotel, featureDTOS);
     }
 
     @Transactional
     @CachePut(cacheNames = "hotels", key = "#hotelId")
     public HotelDTO updateHotel(Hotel hotel, Long hotelId) {
         hotel.setId(hotelId);
-        hotelRepository.save(hotel);
-        return getHotelDTO(hotel);
+        amendLastUpdate(hotel);
+        return hotelMapper.toDTO(hotel);
     }
 
     @Transactional
@@ -142,18 +118,12 @@ public class HotelService {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(HotelNotFoundException::new);
 
+        amendLastUpdate(hotel);
         room.setId(roomId);
         room.setHotel(hotel);
         roomRepository.save(room);
 
-        return new RoomDTO(
-                room.getId(),
-                hotel.getName(),
-                room.getBedroomCount(),
-                room.getBedCount(),
-                room.getMaxGuestsCount(),
-                room.getPrice()
-        );
+        return roomMapper.toDTO(room, hotel);
     }
 
     @Transactional
@@ -164,7 +134,7 @@ public class HotelService {
 
         Set<Room> rooms = roomRepository.findByHotelId(hotelId);
         Set<RoomDTO> roomDTOS = rooms.stream()
-                .map(room -> createRoomDTO(room, hotel))
+                .map(room -> roomMapper.toDTO(room, hotel))
                 .collect(Collectors.toSet());
 
         Set<String> featureNames = hotelRepository.findHotelFeatureList(hotelId);
@@ -174,28 +144,10 @@ public class HotelService {
                 .collect(Collectors.toSet());
 
         Set<FeatureDTO> featureDTOS = features.stream()
-                .map(feature -> new FeatureDTO(
-                        feature.getId(),
-                        feature.getName()
-                ))
+                .map(featureMapper::toDTO)
                 .collect(Collectors.toSet());
 
-
-        return HotelDTO.builder()
-                .id(hotel.getId())
-                .name(hotel.getName())
-                .country(hotel.getCountry())
-                .city(hotel.getCity())
-                .address(hotel.getAddress())
-                .hotelCategory(hotel.getHotelCategory())
-                .accommodationType(hotel.getAccommodationType())
-                .propertyType(hotel.getPropertyType())
-                .description(hotel.getDescription())
-                .checkInTime(hotel.getCheckInTime())
-                .checkOutTime(hotel.getCheckOutTime())
-                .rooms(roomDTOS)
-                .features(featureDTOS)
-                .build();
+        return hotelMapper.toDTOWithDetails(hotel, roomDTOS, featureDTOS);
     }
 
     @Transactional
@@ -204,7 +156,7 @@ public class HotelService {
                 .orElseThrow(HotelNotFoundException::new);
 
         return roomRepository.findByHotelId(hotelId).stream()
-                .map(room -> createRoomDTO(room, hotel))
+                .map(room -> roomMapper.toDTO(room, hotel))
                 .collect(Collectors.toSet());
     }
 
@@ -217,7 +169,7 @@ public class HotelService {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(RoomNotFoundException::new);
 
-        return createRoomDTO(room, hotel);
+        return roomMapper.toDTO(room, hotel);
     }
 
     @Transactional
@@ -229,10 +181,7 @@ public class HotelService {
                 .collect(Collectors.toSet());
 
         return features.stream()
-                .map(feature -> new FeatureDTO(
-                        feature.getId(),
-                        feature.getName()
-                ))
+                .map(featureMapper::toDTO)
                 .collect(Collectors.toSet());
     }
 
@@ -265,9 +214,14 @@ public class HotelService {
             }
     )
     public void removeRoom(Long hotelId, Long roomId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(HotelNotFoundException::new);
+
         Room room = roomRepository.findById(roomId)
                         .orElseThrow(RoomNotFoundException::new);
         roomRepository.delete(room);
+
+        amendLastUpdate(hotel);
     }
 
     @Transactional
@@ -278,34 +232,25 @@ public class HotelService {
             }
     )
     public void removeFeature(Long hotelId, Long featureId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(HotelNotFoundException::new);
+
         HotelFeature hotelFeature = hotelFeatureRepository.findByHotelIdAndFeatureId(hotelId, featureId)
                 .orElseThrow(FeatureNotFoundException::new);
         hotelFeatureRepository.delete(hotelFeature);
+
+        amendLastUpdate(hotel);
     }
 
-    private static HotelDTO getHotelDTO(Hotel hotel) {
-        return HotelDTO.builder()
-                .id(hotel.getId())
-                .name(hotel.getName())
-                .country(hotel.getCountry())
-                .city(hotel.getCity())
-                .address(hotel.getAddress())
-                .hotelCategory(hotel.getHotelCategory())
-                .accommodationType(hotel.getAccommodationType())
-                .propertyType(hotel.getPropertyType())
-                .description(hotel.getDescription())
-                .checkInTime(hotel.getCheckInTime())
-                .checkOutTime(hotel.getCheckOutTime())
-                .build();
+    private HotelFeature createHotelFeature(Hotel hotel, Feature feature) {
+        HotelFeature hotelFeature = new HotelFeature();
+        hotelFeature.setHotel(hotel);
+        hotelFeature.setFeature(feature);
+        return hotelFeature;
     }
 
-    private RoomDTO createRoomDTO(Room room, Hotel hotel) {
-        return new RoomDTO(
-                room.getId(),
-                hotel.getName(),
-                room.getBedroomCount(),
-                room.getBedCount(),
-                room.getMaxGuestsCount(),
-                room.getPrice());
+    private void amendLastUpdate(Hotel hotel) {
+        hotel.setLastUpdate(LocalDateTime.now());
+        hotelRepository.save(hotel);
     }
 }

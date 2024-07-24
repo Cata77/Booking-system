@@ -1,6 +1,6 @@
 package org.booking.booking_service.service;
 
-import org.booking.booking_service.config.JwtUtil;
+import org.booking.booking_service.utils.JwtUtil;
 import org.booking.booking_service.exception.DependentServiceNotAvailableException;
 import org.booking.booking_service.model.RoomDTO;
 import org.springframework.beans.factory.annotation.Value;
