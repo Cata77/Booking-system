@@ -36,6 +36,12 @@ spring:
             - Path=/bookings/**
           filters:
             - PrefixPath=/api/v1
+        - id: search
+          uri: http://localhost:8040
+          predicates:
+            - Path=/search/**
+          filters:
+            - PrefixPath=/api/v1
   security:
     oauth2:
       resourceserver:

@@ -1,0 +1,1 @@
+SELECT 'feature' AS type, * FROM feature;
