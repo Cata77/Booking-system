@@ -20,9 +20,19 @@ public class SearchController {
 
     @GetMapping
     public ResponseEntity<SearchHits<Hotel>> search(
-        @RequestParam(required = false) String name
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String country,
+        @RequestParam(required = false) String city,
+        @RequestParam(required = false) String address,
+        @RequestParam(required = false) String hotelCategory,
+        @RequestParam(required = false) String accommodationType,
+        @RequestParam(required = false) String propertyType,
+        @RequestParam(required = false) String description,
+        @RequestParam(required = false) String checkInTime,
+        @RequestParam(required = false) String checkOutTime
     ) {
-        SearchHits<Hotel> searchHits = service.search(name);
+        SearchHits<Hotel> searchHits = service.search(name, country, city, address, hotelCategory,
+                accommodationType, propertyType, description, checkInTime, checkOutTime);
         return new ResponseEntity<>(searchHits, HttpStatus.OK);
     }
 }
