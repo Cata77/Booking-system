@@ -1037,8 +1037,6 @@ Obackend/search_service/src/main/java/org/booking/search_service/model/Room.java
 Rbackend/search_service/src/main/java/org/booking/search_service/model/Feature.java,0\6\06547a156f9a372825bef2988c74dbfe5c4aad84
 á
 Wbackend/search_service/src/main/java/org/booking/search_service/model/HotelFeature.java,1\c\1c81fa845f778370981ed2a0b365d80a1c065ac9
-è
-_backend/search_service/src/main/java/org/booking/search_service/repository/HotelRepository.java,8\5\85a9572922e225adf20ac26ddcf062a5ad5f4cf0
 ä
 Zbackend/search_service/src/main/java/org/booking/search_service/service/SearchService.java,2\3\237e032898f359e8d722aca1fef7d45373aaaa1b
 P
@@ -1053,12 +1051,6 @@ Zbackend/search_service/src/main/java/org/booking/search_service/config/Security
 Rbackend/search_service/src/main/java/org/booking/search_service/utils/JwtUtil.java,5\4\54943195d06ed40b51d296873add0ef37f3faf95
 M
 logstash/queries/features.sql,b\1\b12cc2f9b44059c025a753534b05dd358716d336
-é
-^backend/search_service/src/main/java/org/booking/search_service/repository/RoomRepository.java,3\8\384345a0f64a75de52897470d830a08ffad359eb
-ë
-abackend/search_service/src/main/java/org/booking/search_service/repository/FeatureRepository.java,2\7\27525b912784f11c307d07fc639ff0b3287390ad
-ñ
-fbackend/search_service/src/main/java/org/booking/search_service/repository/HotelFeatureRepository.java,4\b\4bc9063e1d0b6e30e8697325bbeebed6c0bfb2f9
 è
 _backend/search_service/src/main/java/org/booking/search_service/config/ElasticSearchConfig.java,a\3\a306a58570202c0cc8090f816d0047b85e1fc86e
 â
