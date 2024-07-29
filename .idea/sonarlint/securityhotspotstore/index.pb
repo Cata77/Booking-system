@@ -1041,16 +1041,10 @@ Wbackend/search_service/src/main/java/org/booking/search_service/model/HotelFeat
 Zbackend/search_service/src/main/java/org/booking/search_service/service/SearchService.java,2\3\237e032898f359e8d722aca1fef7d45373aaaa1b
 P
  logstash/queries/hotel_query.sql,e\e\ee1c29feb6a33f35cec490f429afe1e840370008
-O
-logstash/queries/room_query.sql,6\4\6444d106bc48b94488e80e7d1fab0630e61c74c4
-Y
-)logstash/queries/hotel_features_query.sql,9\e\9e32e33a8f1d1b71d4df503c0e363fa9f1559845
 ä
 Zbackend/search_service/src/main/java/org/booking/search_service/config/SecurityConfig.java,7\6\7645222df5f5872cf6a2c165e4d11ff38e6d490b
 Ç
 Rbackend/search_service/src/main/java/org/booking/search_service/utils/JwtUtil.java,5\4\54943195d06ed40b51d296873add0ef37f3faf95
-M
-logstash/queries/features.sql,b\1\b12cc2f9b44059c025a753534b05dd358716d336
 è
 _backend/search_service/src/main/java/org/booking/search_service/config/ElasticSearchConfig.java,a\3\a306a58570202c0cc8090f816d0047b85e1fc86e
 â
