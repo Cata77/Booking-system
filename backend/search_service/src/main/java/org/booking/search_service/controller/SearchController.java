@@ -29,10 +29,16 @@ public class SearchController {
         @RequestParam(required = false) String propertyType,
         @RequestParam(required = false) String description,
         @RequestParam(required = false) String checkInTime,
-        @RequestParam(required = false) String checkOutTime
+        @RequestParam(required = false) String checkOutTime,
+        @RequestParam(required = false) String bedroomCount,
+        @RequestParam(required = false) String bedCount,
+        @RequestParam(required = false) String maxGuestsCount,
+        @RequestParam(required = false) String price,
+        @RequestParam(required = false) String feature
     ) {
         SearchHits<Hotel> searchHits = service.search(name, country, city, address, hotelCategory,
-                accommodationType, propertyType, description, checkInTime, checkOutTime);
+                accommodationType, propertyType, description, checkInTime, checkOutTime,
+                bedroomCount, bedCount, maxGuestsCount, price, feature);
         return new ResponseEntity<>(searchHits, HttpStatus.OK);
     }
 }

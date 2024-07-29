@@ -8,8 +8,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import java.time.LocalTime;
-import java.util.UUID;
+import java.util.Set;
 
 @Document(indexName = "hotels")
 @Data
@@ -20,9 +19,6 @@ public class Hotel {
     @Id
     @Field(type = FieldType.Long, name = "id")
     private Long id;
-
-    @Field(type = FieldType.Keyword, name = "user_id")
-    private UUID userId;
 
     @Field(type = FieldType.Text, name = "name")
     private String name;
@@ -36,21 +32,27 @@ public class Hotel {
     @Field(type = FieldType.Text, name = "address")
     private String address;
 
-    @Field(type = FieldType.Keyword, name = "hotel_category")
-    private HotelCategory hotelCategory;
+    @Field(type = FieldType.Text, name = "hotelCategory")
+    private String hotelCategory;
 
-    @Field(type = FieldType.Keyword, name = "accommodation_type")
-    private AccommodationType accommodationType;
+    @Field(type = FieldType.Text, name = "accommodationType")
+    private String accommodationType;
 
-    @Field(type = FieldType.Keyword, name = "property_type")
-    private PropertyType propertyType;
+    @Field(type = FieldType.Text, name = "propertyType")
+    private String propertyType;
 
     @Field(type = FieldType.Text, name = "description")
     private String description;
 
-    @Field(type = FieldType.Date, name = "check_in_time", pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-    private LocalTime checkInTime;
+    @Field(type = FieldType.Text, name = "checkInTime")
+    private String checkInTime;
 
-    @Field(type = FieldType.Date, name = "check_out_time", pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-    private LocalTime checkOutTime;
+    @Field(type = FieldType.Text, name = "checkOutTime")
+    private String checkOutTime;
+
+    @Field(type = FieldType.Nested, name = "rooms")
+    private Set<Room> rooms;
+
+    @Field(type = FieldType.Nested, name = "features")
+    private Set<Feature> features;
 }

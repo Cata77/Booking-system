@@ -17,17 +17,21 @@ public class SearchService {
 
     public SearchHits<Hotel> search(String name, String country, String city, String address,
             String hotelCategory, String accommodationType, String propertyType, String description,
-            String checkInTime, String checkOutTime
+            String checkInTime, String checkOutTime, String bedroomCount, String bedCount,
+            String maxGuestsCount, String price, String feature
     ) {
         Criteria criteria = buildCriteria(name, country, city, address, hotelCategory, accommodationType,
-                propertyType, description, checkInTime, checkOutTime);
+                propertyType, description, checkInTime, checkOutTime, bedroomCount, bedCount,
+                maxGuestsCount, price, feature);
         Query query = new CriteriaQuery(criteria);
         return elasticsearchOperations.search(query, Hotel.class);
     }
 
     private Criteria buildCriteria(String name, String country, String city, String address,
             String hotelCategory, String accommodationType, String propertyType, String description,
-            String checkInTime, String checkOutTime) {
+            String checkInTime, String checkOutTime, String bedroomCount, String bedCount,
+            String maxGuestsCount, String price, String feature
+    ) {
         Criteria criteria = new Criteria();
 
         if (name != null && !name.isEmpty()) {
@@ -47,15 +51,15 @@ public class SearchService {
         }
 
         if (hotelCategory != null && !hotelCategory.isEmpty()) {
-            criteria = criteria.and("hotel_category").is(hotelCategory);
+            criteria = criteria.and("hotelCategory").is(hotelCategory);
         }
 
         if (accommodationType != null && !accommodationType.isEmpty()) {
-            criteria = criteria.and("accommodation_type").is(accommodationType);
+            criteria = criteria.and("accommodationType").is(accommodationType);
         }
 
         if (propertyType != null && !propertyType.isEmpty()) {
-            criteria = criteria.and("property_type").is(propertyType);
+            criteria = criteria.and("propertyType").is(propertyType);
         }
 
         if (description != null && !description.isEmpty()) {
@@ -63,11 +67,31 @@ public class SearchService {
         }
 
         if (checkInTime != null && !checkInTime.isEmpty()) {
-            criteria = criteria.and("check_in_time").is(checkInTime);
+            criteria = criteria.and("checkInTime").is(checkInTime);
         }
 
         if (checkOutTime != null && !checkOutTime.isEmpty()) {
-            criteria = criteria.and("check_out_time").is(checkOutTime);
+            criteria = criteria.and("checkOutTime").is(checkOutTime);
+        }
+
+        if (bedroomCount != null && !bedroomCount.isEmpty()) {
+            criteria = criteria.and("bedroom_count").lessThanEqual(bedroomCount);
+        }
+
+        if (bedCount != null && !bedCount.isEmpty()) {
+            criteria = criteria.and("bed_count").lessThanEqual(bedCount);
+        }
+
+        if (maxGuestsCount != null && !maxGuestsCount.isEmpty()) {
+            criteria = criteria.and("max_guests_count").lessThanEqual(maxGuestsCount);
+        }
+
+        if (price != null && !price.isEmpty()) {
+            criteria = criteria.and("price").lessThanEqual(price);
+        }
+
+        if (feature != null && !feature.isEmpty()) {
+            criteria = criteria.and("feature").is(feature);
         }
 
         return criteria;
